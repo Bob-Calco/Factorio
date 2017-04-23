@@ -42,7 +42,7 @@ class Database:
                 if machine[1] == 5:
                     machines[row[1]].append(orm.Machine(machine[0], row[1], machine[2], machine[4], machine[5], mining_power=machine[6], mining_speed=machine[7]))
                 else:
-                    machines[row[1]].append(orm.Machine(machine[0], row[1],machine[2], machine[4], machine[5], crafting_speed=machine[3]))
+                    machines[row[1]].append(orm.Machine(machine[0], row[1], machine[2], machine[4], machine[5], crafting_speed=machine[3]))
         return machines
 
     def get_machine(self, name):
@@ -82,3 +82,36 @@ class Database:
         print('Getting machines from type from database')
         self.c.execute("SELECT * FROM machines WHERE type = " + str(machine_type))
         return self.c.fetchall()
+
+    def __add_product(self, name, buildtime, buildamount, machine_type, ingredients):
+        print('Adding ' + name + ' to database')
+        query = ("BEGIN;"
+                 "PRAGMA temp_store = 2;"
+                 "/* declare variables */"
+                 "CREATE TEMP TABLE _variables(Name VARCHAR(100) PRIMARY KEY, vFloat float, vString VARCHAR(100));"
+                 "INSERT INTO _variables values"
+                 "('name', null, '" + name + "'),"
+                 "('buildtime', " + str(buildtime) + ", null),"
+                 "('buildamount', " + str(buildamount) + ", null),"
+                 "('type', null, '" + machine_type + "');"
+                 "/* this is the product */"
+                 "insert into items values (null,"
+                 "(select vString from _variables where name='name'),"
+                 "(select vFloat from _variables where name='buildtime'),"
+                 "(select vFloat from _variables where name='buildamount'),"
+                 "(select id from machine_types where name=(select vString from _variables where name='" + machine_type + "')));"
+                 "/* store the new id */"
+                 "insert into _variables values ('id', (select id from items where name=(select vString from _variables where name = 'name')), null);"
+                 "/* add the ingredients */"
+                 "insert into ingredients values ")
+
+        query_ingredient = (
+                 "((select vFloat from _variables where name='id'),"
+                 "(select id from items where name='__name__'),"
+                 "__amount__),")
+        for ingredient in ingredients:
+            query += query_ingredient.replace('__name__', ingredient[0]).replace('__amount__', str(ingredient[1]))
+
+        query = query[:-1] + ";drop table _variables; END;"
+
+        print(query)

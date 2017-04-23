@@ -1,5 +1,4 @@
 import tkinter as tk
-import functools
 import factorio_database as fdb
 
 
@@ -192,13 +191,17 @@ class MachineFrame(tk.Frame):
 
         i = 1
         for machine_type in machines:
-            tk.Label(self, text=machine_type, bg="white", font="Sans-serif 13 italic").grid(row=i*2-1, column=0)
+            # Put up a label
+            tk.Label(self, text=machine_type, bg="white", font="Sans-serif 13 italic").grid(row=i*2-1, column=0, pady=(10, 0))
+            # A stringvar to hold the selected option
             self.selected_machine_types[machine_type] = tk.StringVar(self)
-            self.selected_machine_types[machine_type].set("Select a machine")
+            # Make the list of options for this machine
             list_of_machines = []
             for machine in machines[machine_type]:
                 list_of_machines.append(machine.name)
-
+            # Preselect the first option
+            self.selected_machine_types[machine_type].set(list_of_machines[0])
+            # Make the option menu
             drop_down = tk.OptionMenu(self, self.selected_machine_types[machine_type], *list_of_machines)
             drop_down.grid(row=i*2, column=0)
             i += 1

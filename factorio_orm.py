@@ -43,7 +43,7 @@ class Item:
             pass
 
         elif ingredient.machine_type == 'Drill':
-            one_ingredient_machine_items_per_second = (ingredient_machine.mining_power - 0.9) * ingredient_machine.mining_speed / 2 # TODO: change 0.9 to be 0.4 if it is about stone
+            one_ingredient_machine_items_per_second = (ingredient_machine.mining_power - 0.9) * ingredient_machine.mining_speed / 2  # TODO: change 0.9 to be 0.4 if it is about stone
             ingredient_items_per_second = items_per_second * ingredient.amount_needed
             machines_needed = ingredient_items_per_second / one_ingredient_machine_items_per_second
 
